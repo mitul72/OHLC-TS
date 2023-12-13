@@ -1,0 +1,8 @@
+{
+  "kafka": {
+    "broker": "127.0.0.1:9092",
+    "partition": 0,
+    "topic": "my_topic",
+    "group": "test_group"
+  }
+}

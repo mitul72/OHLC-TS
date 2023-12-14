@@ -1,0 +1,21 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+message vector_message {
+    double open = 1;
+    double high = 2;
+    double low = 3;
+    double close = 4;
+    double volume = 5;
+    double value = 6;
+}
+  
+message vector_message_list {
+    repeated vector_message messages = 1;
+}
+
+// Define the service
+service OHLCService {
+    rpc SendMyVectorList (vector_message_list) returns (google.protobuf.Empty);
+}
+

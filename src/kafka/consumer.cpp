@@ -5,9 +5,17 @@
 #include <vector>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <sw/redis++/redis++.h>
+#include <string>
+#include <grpcpp/grpcpp.h>
+#include "vector_message.grpc.pb.h"
+#include "vector_message.pb.h"
+#include "grpc-lib/grpc-lib.hpp"
 
 int main()
 {
+    // Connect to Redis
+    sw::redis::Redis redis("tcp://127.0.0.1:6379");
 
     auto configJson = ConfigKF::GetConfigJson("config.json");
 
@@ -28,30 +36,20 @@ int main()
             }
             else
             {
-                std::cout << msg.get_payload() << std::endl;
                 try
                 {
-                    std::ofstream outputFile("output.txt", std::ios::app);
-
                     std::string payload = msg.get_payload();
 
-                    // Parse the JSON
-                    json messageJson = json::parse(payload);
-
-                    if (outputFile.is_open())
+                    // Store the serialized vector
+                    redis.set("OHLC", payload);
+                    vector_message_list list;
+                    if (!list.ParseFromString(payload))
                     {
-                        // Write data to the file
-                        outputFile << msg.get_payload() << "\n";
-                        // Close the file
-                        std::cout << "written" << std::endl;
+                        std::cerr << "Failed to parse MyStructList." << std::endl;
+                        return -1;
                     }
 
-                    else
-                    {
-                        std::cerr << "Unable to open the file." << std::endl;
-                        return 1;
-                    }
-                    outputFile.close();
+                    GRPCLib::StartServer(list);
                 }
                 catch (const std::exception &e)
                 {
@@ -60,9 +58,7 @@ int main()
                 }
             }
         }
+
+        return 0;
     }
-
-    std::cout << "Data appended to the file successfully." << std::endl;
-
-    return 0;
 }

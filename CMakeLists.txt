@@ -4,25 +4,50 @@ set(CMAKE_CXX_STANDARD 20)            # Enable c++14 standard
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
+
 
 # Add main.cpp file of the project root directory as a source file
 set(SOURCE_FILES src/main.cpp)
 
+# <------------ add hiredis dependency --------------->
+find_path(HIREDIS_HEADER hiredis)
+find_path(REDIS_PLUS_PLUS_HEADER sw)
+find_library(REDIS_PLUS_PLUS_LIB redis++)
 
+
+
+
+find_package(gRPC CONFIG REQUIRED)
+find_package(Protobuf REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
-
+find_package(absl REQUIRED)
+find_library(ABSL_LOG_INTERNAL_CHECK_OP_LIB NAMES absl_log_internal_check_op PATHS /usr/lib)
 
 file(GLOB KAFKA_LIB
   "src/kafka/config_json/config_json.cpp"
 )
 add_library(kafkalib ${KAFKA_LIB})
 
+
+
 target_link_libraries(kafkalib PRIVATE
     nlohmann_json::nlohmann_json
 )
 
+add_library(ProtoTest vector_message.proto)
+target_link_libraries(ProtoTest PUBLIC gRPC::grpc++)
+protobuf_generate(TARGET ProtoTest)
+protobuf_generate(
+    TARGET ProtoTest
+    LANGUAGE grpc
+    PLUGIN protoc-gen-grpc=$<TARGET_FILE:gRPC::grpc_cpp_plugin>
+    PLUGIN_OPTIONS generate_mock_code=true
+    GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc)
+
+
 file(GLOB_RECURSE LIB_SOURCES
-    "src/lib/data/*.cpp"
+    "src/lib/*.cpp"
 )
 
 add_library(ohlc_lib ${LIB_SOURCES})
@@ -105,6 +130,13 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/lib
     ${nlohmann_json_SOURCE_DIR}/single_include   
     src/lib/data
+    src/kafka/config_json
+    src/lib/data/protobuf
+    src/kafka/proto_lib
+    ${PROTOBUF_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}
+    ${HIREDIS_HEADER}
+    
 )
 
 # Set compiler flags
@@ -138,25 +170,52 @@ target_include_directories(producer-kafka PRIVATE
   src/kafka/config_json
 )
 
+file(GLOB_RECURSE KF_LIB_SOURCES
+    src/kafka/*.cpp
+)
+
+add_library(kf_lib ${KF_LIB_SOURCES})
+
+target_link_libraries(kf_lib PRIVATE
+    ohlc_lib
+    ProtoTest
+
+)
 
 target_link_libraries(producer-kafka
+    absl::base
+    absl::strings
+    absl::str_format
     cppkafka
     rdkafka
     nlohmann_json::nlohmann_json
     kafkalib
+    ProtoTest
+    kf_lib
+    ${PROTOBUF_LIBRARY}
+    ohlc_lib
+    
 )
 add_executable(consumer-kafka src/kafka/consumer.cpp)
 
 target_include_directories(consumer-kafka PRIVATE 
   ${nlohmann_json_SOURCE_DIR}/single_include
   src/kafka/config_json
+  ${REDIS_PLUS_PLUS_HEADER}
 )
+find_library(HIREDIS_LIB hiredis)
 
 target_link_libraries(consumer-kafka
+    ProtoTest
     cppkafka
     rdkafka
     nlohmann_json::nlohmann_json
     kafkalib
+    kf_lib
+    ${PROTOBUF_LIBRARY}
+    ohlc_lib
+    ${REDIS_PLUS_PLUS_LIB}
+    ${HIREDIS_LIB}
 )
 
 

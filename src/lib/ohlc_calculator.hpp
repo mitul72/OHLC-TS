@@ -20,7 +20,7 @@ public:
      *
      * @return The function `GetOHLC()` returns a vector of OHLC (Open, High, Low, Close) data.
      */
-    auto GetOHLC() -> std::vector<OHLC>;
+    auto GetOHLC(std::vector<double> &prices, std::vector<double> &volumes) -> std::vector<OHLC>;
 
     void convert_to_protobuf();
     void send_protobuf_to_kafka();

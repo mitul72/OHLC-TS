@@ -52,21 +52,17 @@ auto OHLCCalculator::CalculateOHLC(const std::vector<double> &prices, const std:
  *
  * @return The function `GetOHLC()` returns a vector of OHLC (Open, High, Low, Close) data.
  */
-auto OHLCCalculator::GetOHLC() -> std::vector<OHLC>
+auto OHLCCalculator::GetOHLC(std::vector<double> &prices, std::vector<double> &volumes) -> std::vector<OHLC>
 {
-    // Example data
-    std::vector<double>
-        prices = {100.0, 105.0, 95.0, 110.0};
-    std::vector<double> volumes = {1000.0, 800.0, 1200.0, 1500.0};
 
     std::vector<OHLC> ohlcData;
     CalculateOHLC(prices, volumes, ohlcData);
 
-    // Print the calculated OHLC data
-    for (const OHLC &ohlc : ohlcData)
-    {
-        std::cout << "Open: " << ohlc.open << ", High: " << ohlc.high << ", Low: " << ohlc.low << ", Close: " << ohlc.close
-                  << ", Volume: " << ohlc.volume << ", Value: " << ohlc.value << std::endl;
-    }
+    // // Print the calculated OHLC data
+    // for (const OHLC &ohlc : ohlcData)
+    // {
+    //     std::cout << "Open: " << ohlc.open << ", High: " << ohlc.high << ", Low: " << ohlc.low << ", Close: " << ohlc.close
+    //               << ", Volume: " << ohlc.volume << ", Value: " << ohlc.value << std::endl;
+    // }
     return ohlcData;
 }

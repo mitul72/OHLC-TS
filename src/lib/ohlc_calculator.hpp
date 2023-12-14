@@ -22,9 +22,6 @@ public:
      */
     auto GetOHLC(std::vector<double> &prices, std::vector<double> &volumes) -> std::vector<OHLC>;
 
-    void convert_to_protobuf();
-    void send_protobuf_to_kafka();
-
 private:
     /**
      * The function calculates OHLC (Open, High, Low, Close) values for a given set of prices and volumes.

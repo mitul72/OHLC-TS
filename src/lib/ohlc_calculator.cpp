@@ -58,11 +58,5 @@ auto OHLCCalculator::GetOHLC(std::vector<double> &prices, std::vector<double> &v
     std::vector<OHLC> ohlcData;
     CalculateOHLC(prices, volumes, ohlcData);
 
-    // // Print the calculated OHLC data
-    // for (const OHLC &ohlc : ohlcData)
-    // {
-    //     std::cout << "Open: " << ohlc.open << ", High: " << ohlc.high << ", Low: " << ohlc.low << ", Close: " << ohlc.close
-    //               << ", Volume: " << ohlc.volume << ", Value: " << ohlc.value << std::endl;
-    // }
     return ohlcData;
 }

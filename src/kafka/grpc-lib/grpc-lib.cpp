@@ -8,7 +8,7 @@ namespace GRPCLib
      */
     void RunServer()
     {
-        std::string server_address("0.0.0.0:50051");
+        std::string server_address("127.0.0.1:50051");
         OHLCServiceImpl service;
 
         grpc::ServerBuilder builder;
@@ -27,10 +27,14 @@ namespace GRPCLib
         grpc::ClientContext context;
 
         grpc::Status status = stub->SendMyVectorList(&context, list, &reply);
-        if (!status.ok())
+        std::cout << "status" << std::endl;
+        if (status.ok())
         {
-            std::cout << "failed: " << status.error_message() << std::endl;
-            return;
+            std::cout << "RPC Call successful." << std::endl;
+        }
+        else
+        {
+            std::cerr << "RPC failed with status: " << status.error_code() << ": " << status.error_message() << std::endl;
         }
     }
 

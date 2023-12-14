@@ -14,6 +14,6 @@ class OHLCServiceImpl final : public OHLCService::Service
 namespace GRPCLib
 {
     void RunServer();
-    void StartServer(const vector_message_list list);
+    void TestServer(const vector_message_list list);
 
 } // namespace GRPCLib

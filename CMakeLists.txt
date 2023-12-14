@@ -231,4 +231,14 @@ target_link_libraries(tests
     PRIVATE rdkafka
     PRIVATE cppkafka
     GTest::gtest_main
+    absl::base
+    absl::strings
+    absl::str_format
+    nlohmann_json::nlohmann_json
+    kafkalib
+    ProtoTest
+    kf_lib
+    ${PROTOBUF_LIBRARY}
+    ohlc_lib
+
 )

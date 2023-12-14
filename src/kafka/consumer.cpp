@@ -14,6 +14,7 @@
 
 int main()
 {
+
     // Connect to Redis
     sw::redis::Redis redis("tcp://127.0.0.1:6379");
 
@@ -23,13 +24,16 @@ int main()
                                  {"group.id", configJson["kafka"]["group"].get<std::string>()}});
 
     consumer.subscribe({configJson["kafka"]["topic"].get<std::string>()});
+
     while (true)
     {
-        // Open the file in append mode
 
         cppkafka::Message msg = consumer.poll();
+
         if (msg)
         {
+            std::cout << configJson["kafka"]["broker"] << std::endl;
+
             if (msg.get_error())
             {
                 std::cout << "Error: " << msg.get_error() << std::endl;
@@ -38,8 +42,8 @@ int main()
             {
                 try
                 {
-                    std::string payload = msg.get_payload();
 
+                    std::string payload = msg.get_payload();
                     // Store the serialized vector
                     redis.set("OHLC", payload);
                     vector_message_list list;
@@ -48,6 +52,7 @@ int main()
                         std::cerr << "Failed to parse MyStructList." << std::endl;
                         return -1;
                     }
+
                     GRPCLib::RunServer();
                     GRPCLib::TestServer(list);
                 }

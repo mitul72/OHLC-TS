@@ -38,14 +38,16 @@ int main(int argc, char *argv[])
         auto configJson = ConfigKF::GetConfigJson("config.json");
         Configuration config = {
             {"metadata.broker.list", configJson["kafka"]["broker"].get<std::string>()},
-            {"message.max.bytes", 5725714},
+            {"message.max.bytes", 10000000},
         };
 
         // Create the producer
         Producer producer(config);
+        // Set the producer timeout (in milliseconds)
+
+        std::cout << "Serialized Message Size: " << serialized_string.size() << " bytes" << std::endl;
 
         producer.produce(MessageBuilder(configJson["kafka"]["topic"].get<std::string>()).partition(0).payload(serialized_string));
-
         producer.flush();
     }
     catch (const std::exception &e)

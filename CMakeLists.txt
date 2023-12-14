@@ -120,6 +120,9 @@ set(COMPILER_FLAGS
 # Add executable target with source files listed in SOURCE_FILES variable
 add_executable(OHLC ${SOURCE_FILES})
 
+target_link_libraries(OHLC
+    ohlc_lib
+)
 
 # Add executable producer
 add_executable(producer-kafka src/kafka/producer.cpp)

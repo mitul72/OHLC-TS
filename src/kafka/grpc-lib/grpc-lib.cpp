@@ -2,6 +2,10 @@
 
 namespace GRPCLib
 {
+    /**
+     * The function `RunServer()` starts a gRPC server on address "0.0.0.0:50051" and waits for incoming
+     * requests.
+     */
     void RunServer()
     {
         std::string server_address("0.0.0.0:50051");
@@ -14,7 +18,7 @@ namespace GRPCLib
         server->Wait();
     }
 
-    void StartServer(const vector_message_list list)
+    void TestServer(const vector_message_list list)
     {
         std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
         std::unique_ptr<OHLCService::Stub> stub = OHLCService::NewStub(channel);

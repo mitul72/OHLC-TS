@@ -48,8 +48,8 @@ int main()
                         std::cerr << "Failed to parse MyStructList." << std::endl;
                         return -1;
                     }
-
-                    GRPCLib::StartServer(list);
+                    GRPCLib::RunServer();
+                    GRPCLib::TestServer(list);
                 }
                 catch (const std::exception &e)
                 {
@@ -58,7 +58,5 @@ int main()
                 }
             }
         }
-
-        return 0;
     }
 }

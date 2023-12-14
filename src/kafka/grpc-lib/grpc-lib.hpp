@@ -1,6 +1,7 @@
 #include <grpcpp/grpcpp.h>
 #include "vector_message.grpc.pb.h"
 #include "vector_message.pb.h"
+#include <iostream>
 
 class OHLCServiceImpl final : public OHLCService::Service
 {

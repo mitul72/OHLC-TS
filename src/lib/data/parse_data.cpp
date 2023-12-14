@@ -13,45 +13,47 @@ auto ParseData::ParseFile(const std::string &filePath) -> void
         std::cerr << "Failed to open file: " << filePath << std::endl;
         return;
     }
-
-    json jsonData;
-    try
+    // Use nlohmann::json to parse each line separately
+    std::string line;
+    while (std::getline(file, line))
     {
-        auto it = jsonData.find("price");
-        file >> jsonData;
-        if (it != jsonData.end())
+        try
         {
-            price = jsonData["price"].get<double>();
-            quantity = jsonData["quantity"].get<double>();
+            StaticJsonDocument<1024> jsonData;
+            DeserializationError error = deserializeJson(jsonData, line);
+            if (jsonData.containsKey("price"))
+            {
+                price = jsonData["price"].as<double>();
+                quantity = jsonData["quantity"].as<double>();
+                prices.push_back(price);
+                volumes.push_back(quantity * price);
+            }
+            else if (jsonData.containsKey("execution_price"))
+            {
+
+                price = jsonData["execution_price"].as<double>();
+                quantity = jsonData["executed_quantity"].as<double>();
+                prices.push_back(price);
+                volumes.push_back(quantity * price);
+            }
+
+            // reset prices
+
+            price = 0;
+            quantity = 0;
         }
-        else
+        catch (const std::exception &e)
         {
-            price = jsonData["executed_price"].get<double>();
-            quantity = jsonData["executed_quantity"].get<double>();
+            // Catch any exception derived from std::exception
+            std::cerr << "Exception caught: " << e.what() << std::endl;
         }
-        prices.push_back(price);
-        volumes.push_back(quantity);
-
-        // reset prices
-
-        price = 0;
-        quantity = 0;
+        catch (...)
+        {
+            // Catch any other unknown exceptions
+            std::cerr << "Unknown exception caught." << std::endl;
+        }
     }
-    catch (const json::parse_error &e)
-    {
-        std::cerr << "Error parsing JSON in file " << filePath << ": " << e.what() << std::endl;
-        return;
-    }
-    catch (const std::exception &e)
-    {
-        // Catch any exception derived from std::exception
-        std::cerr << "Exception caught: " << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        // Catch any other unknown exceptions
-        std::cerr << "Unknown exception caught." << std::endl;
-    }
+    file.close();
 }
 
 auto ParseData::ParseDirectory(const std::string &directoryPath) -> void

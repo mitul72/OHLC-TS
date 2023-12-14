@@ -4,11 +4,10 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <nlohmann/json.hpp>
+#include <ArduinoJson.h>
 #include <vector>
 #include <stdexcept>
 
-using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 class ParseData

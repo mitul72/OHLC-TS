@@ -31,12 +31,18 @@ add_library(ohlc_lib ${LIB_SOURCES})
 configure_file(${CMAKE_SOURCE_DIR}/config.json ${CMAKE_BINARY_DIR}/config.json COPYONLY)
 
 # Copy RawData to the build folder
-file(COPY ${CMAKE_SOURCE_DIR}/rawdata DESTINATION ${CMAKE_BINARY_DIR}/rawdata)
+file(COPY ${CMAKE_SOURCE_DIR}/rawdata DESTINATION ${CMAKE_BINARY_DIR})
 
 
 
 # Fetching all the deps
 include(FetchContent)
+
+# Arduino Json
+FetchContent_Declare(ArduinoJson
+  GIT_REPOSITORY https://github.com/bblanchon/ArduinoJson.git
+  GIT_TAG v6.21.3
+)
 
 
 # Fetch dependancy: Spdlog
@@ -79,12 +85,12 @@ FetchContent_Declare(
     URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
 )
 
-FetchContent_MakeAvailable(spdlog librdkafka CppKafka json googletest)
+FetchContent_MakeAvailable(spdlog librdkafka CppKafka json googletest ArduinoJson)
 
 # Setup the Kafka consumer/producer executable
 set(KAFKA_EXEC_LIBS
     rdkafka cppkafka
-    nlohmann_json::nlohmann_json spdlog::spdlog
+    nlohmann_json::nlohmann_json spdlog::spdlog ArduinoJson
 )
 
 target_link_libraries(ohlc_lib 

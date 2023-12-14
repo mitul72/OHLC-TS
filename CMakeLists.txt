@@ -21,8 +21,19 @@ target_link_libraries(kafkalib PRIVATE
     nlohmann_json::nlohmann_json
 )
 
+file(GLOB_RECURSE LIB_SOURCES
+    "src/lib/data/*.cpp"
+)
+
+add_library(ohlc_lib ${LIB_SOURCES})
+
 # Copy config.json to the build folder
 configure_file(${CMAKE_SOURCE_DIR}/config.json ${CMAKE_BINARY_DIR}/config.json COPYONLY)
+
+# Copy RawData to the build folder
+file(COPY ${CMAKE_SOURCE_DIR}/rawdata DESTINATION ${CMAKE_BINARY_DIR}/rawdata)
+
+
 
 # Fetching all the deps
 include(FetchContent)
@@ -74,6 +85,20 @@ FetchContent_MakeAvailable(spdlog librdkafka CppKafka json googletest)
 set(KAFKA_EXEC_LIBS
     rdkafka cppkafka
     nlohmann_json::nlohmann_json spdlog::spdlog
+)
+
+target_link_libraries(ohlc_lib 
+    ${KAFKA_EXEC_LIBS}
+)
+
+target_include_directories(ohlc_lib PRIVATE
+    ${nlohmann_json_SOURCE_DIR}/single_include   
+)
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src/lib
+    ${nlohmann_json_SOURCE_DIR}/single_include   
+    src/lib/data
 )
 
 # Set compiler flags
